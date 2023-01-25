@@ -63,7 +63,7 @@ def subbing(pvl_key, video_path, video_path2, audio_path, bin_path, bin_path2):
                 vid1.write_videofile(bin_path)
                 vid1.close()
                 original_video = VideoFileClip(video_path).without_audio()
-                vid2 = original_video.subclip(words[word][1]-0.5, words[word][2]+0.5)
+                vid2 = original_video.subclip(words[word][1]-0.3, words[word][2]+0.3)
                 # ADD statement if word less than 0.75, then omit 0.75
                 # Generate a text clip
                 txt_clip = TextClip(txt=words[word][0], fontsize=75, color='white', bg_color='black')

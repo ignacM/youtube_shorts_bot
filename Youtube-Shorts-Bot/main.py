@@ -39,8 +39,3 @@ if __name__ == '__main__':
     RunModel(video1, screensaver, combined, combined_subtitles,
              final_video, audio, binvideo1, binvideo2, leopard_key, time)
 
-
-
-
-
-

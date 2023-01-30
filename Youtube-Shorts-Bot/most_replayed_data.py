@@ -9,43 +9,56 @@ import subprocess
 def getContentFromURL(url):
     return requests.get(url).text
 
+def getTimeStamp(yt_link):
+    # input_url = str(input("Enter Video Link")) # Ask the user to write a youtube link
+    # videoID finds the id of the video usually between the first = and &
+    videoID = re.findall('=(.*?)&', yt_link) # Find between = and &
 
-# input_url = str(input("Enter Video Link")) # Ask the user to write a youtube link
-# # videoID finds the id of the video usually between the first = and &
-# videoID = re.findall('=(.*?)&', input_url) # Find between = and &
-#
-# output_file = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\combined_videos\downloadedvid.mp4'
-#
-# videoID = videoID[0] # Obtain the first id
-# url = f'https://yt.lemnoslife.com/videos?part=mostReplayed&id={videoID}' # Download youtube video data per videoID
-#
-# content = getContentFromURL(url)
-# data = json.loads(content) # Download content of data
-#
-# # Do a dictionary // list search to find the mostReplayed parameters
-# start_timestamp = data['items'][-1]['mostReplayed']['heatMarkersDecorations'][0]['timedMarkerDecorationRenderer']['visibleTimeRangeStartMillis']
-# end_timestamp = data['items'][-1]['mostReplayed']['heatMarkersDecorations'][0]['timedMarkerDecorationRenderer']['visibleTimeRangeEndMillis']
-#
-# print(start_timestamp)
-# print(end_timestamp)
+    videoID = videoID[0]    # Obtain the first id
+    # try:
+    #     url = f'https://yt2.lemnoslife.com/videos?part=mostReplayed&id={videoID}'
+    #     content = getContentFromURL(url)
+    #     data = json.loads(content) # Download content of data
+    # except AttributeError (or whatever the error name is):
+    #     url = f'http://localhost/YouTube-operational-API/noKey/videos?part=snippet&id={videoID}'
+    # except:
+    #     url = f'https://yt.lemnoslife.com/videos?part=mostReplayed&id={videoID}'
 
-videoID = '2cKmtgCYNEQ'
-start_timestamp = 10.0
-end_timestamp = 20.0
-output_file = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\combined_videos\downloadedvid.mp4'
+    url = f'https://yt.lemnoslife.com/videos?part=mostReplayed&id={videoID}'   # Download youtube video data per videoID
+    #url = f'http://localhost/YouTube-operational-API/noKey/videos?part=snippet&id={videoID}' # Download youtube video data per videoID
 
-"""Y = []
-for heatMarker in data['items'][0]['mostReplayed']['heatMarkers']:
-    heatMarker = heatMarker['heatMarkerRenderer']
-    intensityScoreNormalized = heatMarker['heatMarkerIntensityScoreNormalized']
-    Y += [intensityScoreNormalized]
+    content = getContentFromURL(url)
+    data = json.loads(content)  # Download content of data
 
-plt.plot(Y)
-plt.show()
-print(Y)"""
+    print(data)
 
-def download_clip(video_identifier, output_filename,
-                  start_time, end_time,
+    # Do a dictionary // list search to find the mostReplayed parameters
+    start_timestamp = data['items'][-1]['mostReplayed']['heatMarkersDecorations'][0]['timedMarkerDecorationRenderer']['visibleTimeRangeStartMillis']/1000
+    end_timestamp = data['items'][-1]['mostReplayed']['heatMarkersDecorations'][0]['timedMarkerDecorationRenderer']['visibleTimeRangeEndMillis']/1000
+    video_length = data['items'][-1]['mostReplayed']['heatMarkers'][-1]['heatMarkerRenderer']['timeRangeStartMillis']/1000
+
+
+    # Expanding %time of video
+    start_timestamp = start_timestamp - 5
+    end_timestamp = end_timestamp + 3
+
+    print(start_timestamp)
+    print(end_timestamp)
+
+    """Y = []
+    for heatMarker in data['items'][0]['mostReplayed']['heatMarkers']:
+        heatMarker = heatMarker['heatMarkerRenderer']
+        intensityScoreNormalized = heatMarker['heatMarkerIntensityScoreNormalized']
+        Y += [intensityScoreNormalized]
+    
+    plt.plot(Y)
+    plt.show()
+    print(Y)"""
+
+    return videoID, start_timestamp, end_timestamp
+
+
+def download_clip(link, output_filename,
                   tmp_dir='/tmp/kinetics',
                   num_attempts=5,
                   url_base='https://www.youtube.com/watch?v='):
@@ -62,10 +75,13 @@ def download_clip(video_identifier, output_filename,
     end_time: float
         Indicates the ending time in seconds of the trimmed video.
     """
+
+    video_identifier, start_time, end_time = getTimeStamp(link)
     # Defensive argument checking.
     assert isinstance(video_identifier, str), 'video_identifier must be string'
     assert isinstance(output_filename, str), 'output_filename must be string'
     assert len(video_identifier) == 11, 'video_identifier %s must have length 11' %video_identifier
+
 
     status = False
     # Construct command line for getting the direct video link.
@@ -140,4 +156,6 @@ def download_clip(video_identifier, output_filename,
     return status, 'Downloaded'
 
 if __name__ == '__main__':
-    download_clip(videoID, output_file, start_timestamp, end_timestamp)
+    input_url = str(input("Enter Video Link"))  # Ask the user to write a youtube link
+    output = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\combined_videos\downloadedvid.mp4'
+    download_clip(input_url, output)

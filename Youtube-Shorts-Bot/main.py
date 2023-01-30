@@ -1,7 +1,7 @@
 from video_combiner_2_func import combineVideo, subbing, inputAudio
 
 # Set important parameters, input video, output video location, screensaver, how much % of video (1 = 100%)
-video1 = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\videos\1.mp4'
+video1 = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\combined_videos\downloadedvid.mp4'
 screensaver = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\screensaver\1.mp4'
 final_video = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\combined_videos\result3.mp4'
 time = 0.2
@@ -28,6 +28,8 @@ def RunModel(top_video, bottom_video, combined_video, combined_video_2, output, 
     # audio: absolute path to location of where to store audio (can be bin)
     # bin_vid1 = absolute path to location of currently edited video (can be bin)
     # bin_vid2 = absolute path to location of currently edited video (can be bin)
+
+
 
     combineVideo(top_video, bottom_video, combined_video, combined_video_2, length)
     subbing(key, combined_video, combined_video_2, audio, bin_vid1, bin_vid2)

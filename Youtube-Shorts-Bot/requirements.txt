@@ -3,3 +3,11 @@ webdriver-manager
 moviepy
 requests
 beautifulsoup4
+os
+subprocess
+re
+json
+time
+random
+numpy
+pvleopard

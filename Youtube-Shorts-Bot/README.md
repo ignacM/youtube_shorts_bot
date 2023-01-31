@@ -1,7 +1,12 @@
 # Youtube-Shorts-Bot
- This Python Bot Scrape Videos from Pexels, & Add a Random Song from Songs Folder, Then You Can Auto Upload The Videos To Your Youtube Channel
+ This bot uses a downloaded screensaver video and a user input YouTube link to edit and generate a video.
+1. The bot downloads the most replayed clip from a YouTube video. 
+2. Combines it with a saved screensaver video.
+3. Then, using an AI, subtitles are generated and printed onto the video. 
+4. Finally, the video is uploaded to YouTube
 # Set up the Bot
- Create Two Folders Name Them: songs, videos<br>
- Install The Necessary Libraries: pip install -r requirements.txt<br>
- Watch this full tutorial on how to use this bot step by step<br>
-     >https://youtu.be/5HduB5-lbgY
+ 1. Install The Necessary Libraries: pip install -r requirements.txt<br>
+2. Download a video containing a lot of clips (screensaver location)
+3. Check locations in main.py
+4. Add pvleopard key (in subbing2 function inside of vid_editer.py)
+5. Get a YouTube link and run main.py

@@ -1,7 +1,8 @@
 import os
 from vid_editer import combineVideo, subbing2
-from most_replayed_downloader import download_clip
+from most_replayed_downloader import download_clip_most_replayed, download_clip_timestamps
 from vid_uploader import uploader
+from vid_cropper import vidCropper
 
 # Set important parameters: output video location, screensaver video
 screensaver = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\screensaver\1.mp4'
@@ -13,12 +14,13 @@ video1 = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\c
 combined = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\combined.mp4'
 combined_subtitles = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\combined_subs.mp4'
 audio_path = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\audio.mp3'
+ar_edited = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\ar_vid.mp4'
 
 subtitles_path = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\subtitles.srt'
 
 
-def DownEdUp(top_video, bottom_video, combined_video, subtitles,
-             output, audio, link, length):
+def DownEdUp(top_video, bottom_video, combined_video, ar_video, subtitles,
+             output, audio, link, answer, length):
     """
     Editing the most replayed clip of a provided YouTube video hyperlink:
         1. Given a user-input hyperlink, downloading the most replayed clip from a YouTube video.
@@ -32,6 +34,7 @@ def DownEdUp(top_video, bottom_video, combined_video, subtitles,
     :param top_video: absolute path to top video
     :param bottom_video: absolute path to screensaver video
     :param combined_video: absolute path to location of output video (video1 + video2, can be bin)
+    :param ar_video: absolute path of where to store AR adjusted video
     :param subtitles: absolute path of where to store subtitles (can be bin)
     :param output: absolute path to location of output video with audio (video1 + video2 + subtitles + audio)
     :param audio: absolute path to location of where to store audio (can be bin)
@@ -43,11 +46,20 @@ def DownEdUp(top_video, bottom_video, combined_video, subtitles,
 
     """
 
-    download_clip(link, top_video)
+    if answer == 1:
+        download_clip_most_replayed(link, top_video)
+    else:
+        starting_time = str(input("What is the starting time?"))
+        starting_time = sum(x * float(t) for x, t in zip([1, 60, 3600], reversed(starting_time.split(":"))))
+        ending_time = str(input("What is the ending time?"))
+        ending_time = sum(x * float(t) for x, t in zip([1, 60, 3600], reversed(ending_time.split(":"))))
+        download_clip_timestamps(link, top_video, starting_time, ending_time)
 
     combineVideo(top_video, bottom_video, combined_video, length)
 
-    subbing2(combined_video, audio, subtitles, output)
+    vidCropper(combined_video, ar_video)
+
+    subbing2(ar_video, audio, subtitles, output)
 
     uploader()
 
@@ -62,9 +74,12 @@ if __name__ == '__main__':
     # Requests YouTube hyperlink from user.
     input_url = str(input("Enter Youtube Video Link"))
 
+    # Asks user the type of download
+    dl_type = int(input("Enter 1 for most replayed data, or 2 for user selected timestamps"))
+
     """
     Add input to ask user if to give timestamps, or use the ones from most replayed.
     """
     # Run the Downloader, Edit, Uploader function.
-    DownEdUp(video1, screensaver, combined, subtitles_path,
-             final_video, audio_path, input_url, length=1)
+    DownEdUp(video1, screensaver, combined, ar_edited, subtitles_path,
+             final_video, audio_path, input_url, dl_type, length=1)

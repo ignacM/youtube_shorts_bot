@@ -39,10 +39,15 @@ def combineVideo(video1_path, ss_path, output_path, video_length):
     percentage_of_video = video_length
     input_video = VideoFileClip(video1_path)
     input_video2 = VideoFileClip(ss_path)
-    duration = input_video.duration*percentage_of_video
-    input_video = VideoFileClip(video1_path).subclip(0, duration)
-    duration2 = input_video2.duration
-    x = random.randint(0, round(duration2-duration))
+    if video_length != 1:
+        duration = input_video.duration * percentage_of_video
+        input_video = VideoFileClip(video1_path).subclip(0, duration)
+        duration2 = input_video2.duration
+        x = random.randint(0, round(duration2 - duration))
+    else:
+        duration = input_video.duration
+        duration2 = input_video2.duration
+        x = random.randint(0, round(duration2 - duration))
 
     resolution = input_video.size
     resolution = (resolution[1], resolution[0])
@@ -186,7 +191,7 @@ def subbing2(video_path, audio_path, subtitles_path, final_path):
         f.write(to_srt(words))
 
     # Read the subtitles with desired font, size, color etc.
-    generator = lambda txt: TextClip(txt, font='Georgia-Regular', fontsize=75, color='white', bg_color='black')
+    generator = lambda txt: TextClip(txt, font='Georgia-Regular', fontsize=65, color='white', bg_color='black')
     sub = SubtitlesClip(subtitles_path, generator)
 
     # Write the final video with the subtitles.
@@ -210,7 +215,7 @@ def second_to_timecode(x: float) -> str:
 def to_srt(
         words: Sequence[pvleopard.Leopard.Word],
         endpoint_sec: float = 1.,
-        length_limit: Optional[int] = 6) -> str:
+        length_limit: Optional[int] = 4) -> str:
     """
     Set: length_limit: Optional[int] =
     as the number of maximum words per subtitle eg if 4  then:

@@ -1,5 +1,5 @@
 from pytube import YouTube
-
+# Input url for automatic download of videos
 url = "https://www.youtube.com/results?search_query=free+to+use+gameplay"
 
 # Connect to the YouTube URL

@@ -5,6 +5,12 @@ import requests
 from urllib.request import urlopen
 
 def downloadVideo(link, id):
+    """
+    Adapted from https://www.youtube.com/watch?v=UsT11sOD1JA&t=1s&ab_channel=CodewithVincent
+    :param link:
+    :param id:
+    :return:
+    """
     import requests
 
     cookies = {

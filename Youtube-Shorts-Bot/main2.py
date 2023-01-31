@@ -10,13 +10,15 @@ leopard_key = 'nJlVKvSmD5anx+huNCZlVFkv74NxbEbqUlt8q9bQ7d+aGqJe6gtEHg=='
 video1 = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\combined_videos\downloadedvid.mp4'
 combined = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\combined.mp4'
 combined_subtitles = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\combined_subs.mp4'
-audio = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\audio.mp3'
-binvideo1 = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\vid1.mp4'
-binvideo2 = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\vid2.mp4'
-subtitles = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\subtitles.srt'
+audio_path = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\audio.mp3'
 
-def RunModel(top_video, bottom_video, combined_video, combined_video_2,
-             output, audio, bin_vid1, bin_vid2, key, length, link):
+# binvideo1 = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\vid1.mp4'
+# binvideo2 = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\vid2.mp4'
+subtitles_path = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\subtitles.srt'
+
+
+def RunModel(top_video, bottom_video, combined_video, subtitles,
+             output, audio, link, length):
     # IMPORTANT: key: to access pvleopard API
     # top_video: absolute path to top video
     # bottom_video: absolute path to screensaver video
@@ -29,7 +31,7 @@ def RunModel(top_video, bottom_video, combined_video, combined_video_2,
 
     download_clip(link, top_video)
 
-    combineVideo(top_video, bottom_video, combined_video, combined_video_2, length)
+    combineVideo(top_video, bottom_video, combined_video, length)
 
     subbing2(combined_video, audio, subtitles, output)
 
@@ -39,8 +41,8 @@ def RunModel(top_video, bottom_video, combined_video, combined_video_2,
 if __name__ == '__main__':
 
     input_url = str(input("Enter Youtube Video Link"))  # Ask the user to write a youtube link
-    time = int(input("percentage of video"))  # how much % of video (1 = 100%) to download
+    # time = int(input("percentage of video"))  # how much % of video (1 = 100%) to download
     # Add input to ask user if to give timestamps, or use the ones from most replayed.
-    RunModel(video1, screensaver, combined, combined_subtitles,
-             final_video, audio, binvideo1, binvideo2, leopard_key, time, input_url)
+    RunModel(video1, screensaver, combined, subtitles_path,
+             final_video, audio_path, input_url, length=1)
 

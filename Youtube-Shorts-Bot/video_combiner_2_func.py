@@ -1,25 +1,33 @@
-# This script combines two videos into one, using a mobile 9:16 aspect ratio
+"""
+ This script contains functions to combine two videos into one, create subtitles using pvleopard AI,
+ and to write subtitles into a video.
+"""
 
 import cv2
 import random
-from moviepy.editor import VideoFileClip, clips_array
-from moviepy.video.tools import subtitles
-import pvleopard
-from pvleopard import Sequence, Optional
 import numpy as np
+import pvleopard
 import math
 import time
-from moviepy.editor import VideoFileClip, concatenate_videoclips, TextClip, CompositeVideoClip, AudioFileClip
-from moviepy.video.tools import subtitles
 import re
-import numpy as np
+from pvleopard import Sequence, Optional
+from moviepy.editor import VideoFileClip, concatenate_videoclips, CompositeVideoClip, AudioFileClip, clips_array
 from moviepy.tools import cvsecs
 from moviepy.video.VideoClip import TextClip, VideoClip
 from moviepy.video.tools.subtitles import SubtitlesClip
 
 
-
-def combineVideo(video1_path, ss_path, output_path, output_path2, video_length):
+def combineVideo(video1_path, ss_path, output_path, video_length):
+    """
+    Video combiner that takes to videos and plays one on top of the other. The combiner randomly selects
+    a clip of the second video with the same duration as the first video.
+    :param video1_path: video path of the video that goes on top
+    :param ss_path: video path of the video that goes below the top video.
+    :param output_path: Desired path of the output
+    :param video_length: Percentage [0-1] of how long should the top video be cropped to. For full video
+                        duration select 1.
+    :return:
+    """
     print('..................')
     print('..................')
     print('..................')
@@ -45,7 +53,7 @@ def combineVideo(video1_path, ss_path, output_path, output_path2, video_length):
 
     # Output video file
     combined_video.write_videofile(output_path)
-    combined_video.write_videofile(output_path2)
+    # combined_video.write_videofile(output_path2)
 
     print('................')
     print('................')
@@ -58,6 +66,19 @@ def combineVideo(video1_path, ss_path, output_path, output_path2, video_length):
 
 
 def subbing(pvl_key, video_path, video_path2, audio_path, bin_path, bin_path2):
+    """
+    Seeded function since moviepy has an accessible working unreleased developing-stage function that can
+    create subtitles more efficiently. This function works but is more computationally expensive.
+    Need to use the function inputAudio afterwards to play the sound.
+
+    :param pvl_key: Insert the key provided by pvleopard API
+    :param video_path: input path: video without subtitles
+    :param video_path2: output path: video with subtitles
+    :param audio_path:
+    :param bin_path: bin path needed to locally store the video (can be any path)
+    :param bin_path2: bin path needed to locally store the video (can be any path)
+    :return:
+    """
     # Access pvLeopard.
     leopard = pvleopard.create(access_key=pvl_key)
     # Read video files and separate the audio
@@ -66,13 +87,13 @@ def subbing(pvl_key, video_path, video_path2, audio_path, bin_path, bin_path2):
     audioclip.write_audiofile(audio_path)
     audioclip.close()
 
-    # Produce transcript
+    # Produce transcript using pvleopard API:
     transcript, words = leopard.process_file(audio_path)
 
     wordcount = len(words)-1
     #secondcount = math.ceil(words[wordcount]["end_sec"])
     secondcount = 1
-    seconds = np.arange(0, secondcount, 0.5)
+    seconds = np.arange(0, secondcount, 0.5) # Storing a numbers 0, 0.5, 1 to iterate over every word
     word = 0
 
     while word < wordcount:
@@ -116,6 +137,13 @@ def subbing(pvl_key, video_path, video_path2, audio_path, bin_path, bin_path2):
 
 
 def inputAudio(video_path, audio_path, output):
+    """
+    inputAudio takes a recorded audio and plays it onto a video
+    :param video_path: soundless video path
+    :param audio_path: audio path
+    :param output: location of ouput video with sound
+    :return:
+    """
     # Output video file
     finalclip = VideoFileClip(video_path)
     sound = AudioFileClip(audio_path)
@@ -125,34 +153,59 @@ def inputAudio(video_path, audio_path, output):
 
 
 def subbing2(video_path, audio_path, subtitles_path, final_path):
-    # Access pvLeopard.
-    key = 'nJlVKvSmD5anx+huNCZlVFkv74NxbEbqUlt8q9bQ7d+aGqJe6gtEHg=='
-    leopard = pvleopard.create(access_key=key)
+    """
+    This function uses the Experimental module for subtitles support from moviepy. It uses pvleopard to
+    create an AI generated transcript of the video.
+
+    Adapted from experimental module availabe at:
+    https://zulko.github.io/moviepy/_modules/moviepy/video/tools/subtitles.html#SubtitlesClip
+
+    :param video_path: path of the video
+    :param audio_path: path of where to store the audio of the video (needed for pvleopard transcript generation)
+    :param subtitles_path: path of where to store the subtitles
+    :param final_path: desired output path of the video
+    :return:
+
+    Other parameters needed are pvLeopard key, which can be input below
+
+    """
+
     # Read video files and separate the audio
     videoclip = VideoFileClip(video_path)
     audioclip = videoclip.audio
     audioclip.write_audiofile(audio_path)
 
-
-    # Produce transcript
+    # Access pvLeopard API.
+    key = 'nJlVKvSmD5anx+huNCZlVFkv74NxbEbqUlt8q9bQ7d+aGqJe6gtEHg=='
+    leopard = pvleopard.create(access_key=key)
+    # Produce transcript with pvleopard.
     transcript, words = leopard.process_file(audio_path)
 
+    # Write generated subtitles into a srt file.
     with open(subtitles_path, 'w') as f:
         f.write(to_srt(words))
 
+    # Read the subtitles with desired font, size, color etc.
     generator = lambda txt: TextClip(txt, font='Georgia-Regular', fontsize=75, color='white', bg_color='black')
     sub = SubtitlesClip(subtitles_path, generator)
 
+    # Write the final video with the subtitles.
     final = CompositeVideoClip([videoclip, sub.set_position("center")])
     final.write_videofile(final_path, fps=videoclip.fps)
 
 
 def second_to_timecode(x: float) -> str:
+    """
+    Adapted from:
+    https://picovoice.ai/blog/how-to-create-subtitles-for-any-video-with-python/#:~:text=How%20to%20Create%20Subtitles%20for%20any%20Video%20with,No%20speech%20recognition%20technology%20is%20100%25%20accurate.%20
+    """
+
     hour, x = divmod(x, 3600)
     minute, x = divmod(x, 60)
     second, x = divmod(x, 1)
     millisecond = int(x * 1000.)
     return '%.2d:%.2d:%.2d,%.3d' % (hour, minute, second, millisecond)
+
 
 def to_srt(
         words: Sequence[pvleopard.Leopard.Word],
@@ -166,7 +219,11 @@ def to_srt(
     Ignacio and what is
     your name?
 
+    Adapted from:
+    https://picovoice.ai/blog/how-to-create-subtitles-for-any-video-with-python/#:~:text=How%20to%20Create%20Subtitles%20for%20any%20Video%20with,No%20speech%20recognition%20technology%20is%20100%25%20accurate.%20
+
     """
+
     def _helper(end: int) -> None:
         lines.append("%d" % section)
         lines.append(
@@ -190,5 +247,6 @@ def to_srt(
             section += 1
     _helper(len(words) - 1)
     return '\n'.join(lines)
+
 
 #if __name__ == '__main__':

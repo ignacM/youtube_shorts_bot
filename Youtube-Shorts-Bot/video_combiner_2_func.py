@@ -154,7 +154,7 @@ def inputAudio(video_path, audio_path, output):
 
 def subbing2(video_path, audio_path, subtitles_path, final_path):
     """
-    This function uses the Experimental module for subtitles support from moviepy. It uses pvleopard to
+    This function uses the Experimental module for subtitles from moviepy. It uses pvleopard to
     create an AI generated transcript of the video.
 
     Adapted from experimental module availabe at:

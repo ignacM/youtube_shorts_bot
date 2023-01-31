@@ -4,12 +4,20 @@ import matplotlib.pyplot as plt
 import re
 import subprocess
 
-# Adapted from https://github.com/Benjamin-Loison/YouTube-operational-API
-
 def getContentFromURL(url):
+    """
+    Adapted from https://github.com/Benjamin-Loison/YouTube-operational-API
+    """
     return requests.get(url).text
 
+
 def getTimeStamp(yt_link):
+    """
+    Adapted from https://github.com/Benjamin-Loison/YouTube-operational-API
+
+    :param yt_link: give YouTube hyperlink
+    :return:
+    """
     # input_url = str(input("Enter Video Link")) # Ask the user to write a youtube link
     # videoID finds the id of the video usually between the first = and &
     videoID = re.findall('=(.*?)&', yt_link) # Find between = and &
@@ -25,18 +33,17 @@ def getTimeStamp(yt_link):
     #     url = f'https://yt.lemnoslife.com/videos?part=mostReplayed&id={videoID}'
 
     url = f'https://yt.lemnoslife.com/videos?part=mostReplayed&id={videoID}'   # Download youtube video data per videoID
-    #url = f'http://localhost/YouTube-operational-API/noKey/videos?part=snippet&id={videoID}' # Download youtube video data per videoID
+    # url = f'http://localhost/YouTube-operational-API/noKey/videos?part=snippet&id={videoID}' # Download youtube video data per videoID
 
     content = getContentFromURL(url)
     data = json.loads(content)  # Download content of data
 
-    print(data)
+    # print(data)
 
     # Do a dictionary // list search to find the mostReplayed parameters
     start_timestamp = data['items'][-1]['mostReplayed']['heatMarkersDecorations'][0]['timedMarkerDecorationRenderer']['visibleTimeRangeStartMillis']/1000
     end_timestamp = data['items'][-1]['mostReplayed']['heatMarkersDecorations'][0]['timedMarkerDecorationRenderer']['visibleTimeRangeEndMillis']/1000
     video_length = data['items'][-1]['mostReplayed']['heatMarkers'][-1]['heatMarkerRenderer']['timeRangeStartMillis']/1000
-
 
     # Expanding %time of video
     start_timestamp = start_timestamp - 5
@@ -44,8 +51,8 @@ def getTimeStamp(yt_link):
         start_timestamp = 0
     end_timestamp = end_timestamp + 3
 
-    print(start_timestamp)
-    print(end_timestamp)
+    print('Clip starts at %s' % start_timestamp)
+    print('Clip ends at %s' % end_timestamp)
 
     """Y = []
     for heatMarker in data['items'][0]['mostReplayed']['heatMarkers']:
@@ -64,13 +71,22 @@ def download_clip(link, output_filename,
                   tmp_dir='/tmp/kinetics',
                   num_attempts=5,
                   url_base='https://www.youtube.com/watch?v='):
-    """Download a video from youtube if exists and is not blocked.
+    """
+    Adapted from still-unresolved youtube-dl issue 622: https://github.com/ytdl-org/youtube-dl/issues/622
+
+    Download a video from YouTube if exists and is not blocked.
+
+    :param link: given YouTube hyperlink
+    :param output_filename: str
+        File path where the video will be stored.
+    :param num_attempts: given
+    :param url_base: given
+    :return:
+
     arguments:
-    ---------
+    ------
     video_identifier: str
         Unique YouTube video identifier (11 characters)
-    output_filename: str
-        File path where the video will be stored.
     start_time: float
         Indicates the begining time in seconds from where the video
         will be trimmed.

@@ -40,6 +40,8 @@ def getTimeStamp(yt_link):
 
     # Expanding %time of video
     start_timestamp = start_timestamp - 5
+    if start_timestamp < 0:
+        start_timestamp = 0
     end_timestamp = end_timestamp + 3
 
     print(start_timestamp)
@@ -155,7 +157,9 @@ def download_clip(link, output_filename,
     # os.remove(tmp_filename)
     return status, 'Downloaded'
 
+
 if __name__ == '__main__':
     input_url = str(input("Enter Video Link"))  # Ask the user to write a youtube link
     output = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\combined_videos\downloadedvid.mp4'
     download_clip(input_url, output)
+

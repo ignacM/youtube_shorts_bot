@@ -1,4 +1,4 @@
-from video_combiner_2_func import combineVideo, subbing, inputAudio
+from video_combiner_2_func import combineVideo, subbing2
 from download_most_replayed_clip import download_clip
 
 # Set important parameters: output video location, screensaver video
@@ -31,9 +31,8 @@ def RunModel(top_video, bottom_video, combined_video, combined_video_2,
 
     combineVideo(top_video, bottom_video, combined_video, combined_video_2, length)
 
-    subbing(key, combined_video, combined_video_2, audio, bin_vid1, bin_vid2)
+    subbing2(combined_video, audio, subtitles, output)
 
-    inputAudio(combined_video_2, audio, output)
     return
 
 

@@ -29,20 +29,23 @@ def getTimeStamp(yt_link):
     """
     # input_url = str(input("Enter Video Link")) # Ask the user to write a youtube link
     videoID = getVideoID(yt_link)
-    """# videoID finds the id of the video usually between the first = and &
-    videoID = re.findall('=(.*?)&', yt_link) # Find between = and &
 
-    videoID = videoID[0]    # Obtain the first id"""
-    # try:
-    #     url = f'https://yt2.lemnoslife.com/videos?part=mostReplayed&id={videoID}'
-    #     content = getContentFromURL(url)
-    #     data = json.loads(content) # Download content of data
-    # except AttributeError (or whatever the error name is):
-    #     url = f'http://localhost/YouTube-operational-API/noKey/videos?part=snippet&id={videoID}'
-    # except:
-    #     url = f'https://yt.lemnoslife.com/videos?part=mostReplayed&id={videoID}'
+    try:
+        try:
+            url = f'https://yt.lemnoslife.com/videos?part=mostReplayed&id={videoID}'
+            content = getContentFromURL(url)
+            data = json.loads(content) # Download content of data
+        except:
+            url = f'http://localhost/YouTube-operational-API/noKey/videos?part=snippet&id={videoID}'
+            """
+            Hosting of the server needs to be ocurring, more on how to host a server can be found in:
+            https://github.com/Benjamin-Loison/YouTube-operational-API/blob/main/README.md
+            """
+    except:
+        url = f'https://yt2.lemnoslife.com/videos?part=mostReplayed&id={videoID}'
 
-    url = f'https://yt.lemnoslife.com/videos?part=mostReplayed&id={videoID}'   # Download youtube video data per videoID
+
+    # url = f'https://yt.lemnoslife.com/videos?part=mostReplayed&id={videoID}'   # Download youtube video data per videoID
     # url = f'http://localhost/YouTube-operational-API/noKey/videos?part=snippet&id={videoID}' # Download youtube video data per videoID
 
     content = getContentFromURL(url)

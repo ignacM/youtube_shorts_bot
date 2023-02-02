@@ -10,12 +10,11 @@ final_video = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-
 # Set pvleopard Key
 leopard_key = 'nJlVKvSmD5anx+huNCZlVFkv74NxbEbqUlt8q9bQ7d+aGqJe6gtEHg=='
 # Set bin location: (can be anywhere)
-video1 = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\combined_videos\downloadedvid.mp4'
-combined = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\combined.mp4'
-combined_subtitles = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\combined_subs.mp4'
+video1 = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\vid1.mp4'
+combined = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\vid12.mp4'
+combined_subtitles = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\vid1234.mp4'
 audio_path = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\audio.mp3'
-ar_edited = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\ar_vid.mp4'
-
+ar_edited = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\vid123.mp4'
 subtitles_path = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\subtitles.srt'
 
 
@@ -23,7 +22,8 @@ def DownEdUp(top_video, bottom_video, combined_video, ar_video, subtitles,
              output, audio, link, answer, length):
     """
     Editing the most replayed clip of a provided YouTube video hyperlink:
-        1. Given a user-input hyperlink, downloading the most replayed clip from a YouTube video.
+        1. Given a user-input hyperlink, downloading the most replayed clip from a YouTube video,
+        or by giving timestamps
         2. Given a location filled with screen saver videos, combine the downloaded clip
          with a randomly chosen clip from the given location.
         3. Using pvleopard API for speach to text generation, use AI to create a transcription,
@@ -39,6 +39,7 @@ def DownEdUp(top_video, bottom_video, combined_video, ar_video, subtitles,
     :param output: absolute path to location of output video with audio (video1 + video2 + subtitles + audio)
     :param audio: absolute path to location of where to store audio (can be bin)
     :param link: YouTube hyperlink of video (should have visible most replayed data)
+    :param answer: select 1 for most replayed data and 2 for input timestamps
     :param length: (0-1) how long should the video be. 1: full clip included
     :return:
 
@@ -50,9 +51,11 @@ def DownEdUp(top_video, bottom_video, combined_video, ar_video, subtitles,
         download_clip_most_replayed(link, top_video)
     else:
         starting_time = str(input("What is the starting time?"))
-        starting_time = sum(x * float(t) for x, t in zip([1, 60, 3600], reversed(starting_time.split(":"))))
+        starting_time = sum(x * float(t) for x, t in zip([1, 60, 3600], reversed(starting_time.split(":"))))-1
+        # -1 seconds because uploader lags in first downloaded frame
         ending_time = str(input("What is the ending time?"))
-        ending_time = sum(x * float(t) for x, t in zip([1, 60, 3600], reversed(ending_time.split(":"))))
+        ending_time = sum(x * float(t) for x, t in zip([1, 60, 3600], reversed(ending_time.split(":"))))+5
+        # +3 seconds because moviepy fails to compile the last 3 seconds
         download_clip_timestamps(link, top_video, starting_time, ending_time)
 
     combineVideo(top_video, bottom_video, combined_video, length)

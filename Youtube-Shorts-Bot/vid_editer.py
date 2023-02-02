@@ -37,22 +37,22 @@ def combineVideo(video1_path, ss_path, output_path, video_length):
     print('..................')
     # Input video files
     percentage_of_video = video_length
-    input_video = VideoFileClip(video1_path)
+    input_video = VideoFileClip(video1_path).subclip(1, -5)
     input_video2 = VideoFileClip(ss_path)
     if video_length != 1:
         duration = input_video.duration * percentage_of_video
         input_video = VideoFileClip(video1_path).subclip(0, duration)
-        duration2 = input_video2.duration
-        x = random.randint(0, round(duration2 - duration))
     else:
         duration = input_video.duration
-        duration2 = input_video2.duration
-        x = random.randint(0, round(duration2 - duration))
 
+    duration2 = input_video2.duration
+    x = random.randint(0, round(duration2 - duration))
     resolution = input_video.size
     resolution = (resolution[1], resolution[0])
 
     input_video2 = VideoFileClip(ss_path, target_resolution=resolution).subclip(x, x+duration).without_audio()
+
+
 
     combined_video = clips_array([[input_video], [input_video2]])
 

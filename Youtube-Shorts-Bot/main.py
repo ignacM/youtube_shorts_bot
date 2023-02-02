@@ -1,5 +1,5 @@
 import os
-from vid_editer import combineVideo, subbing2
+from vid_editer import combineVideo, subbing2, inputAudio, randSFX, addSFX
 from most_replayed_downloader import download_clip_most_replayed, download_clip_timestamps
 from vid_uploader import uploader
 from vid_cropper import vidCropper
@@ -7,6 +7,8 @@ from vid_cropper import vidCropper
 # Set important parameters: output video location, screensaver video
 screensaver = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\screensaver\1.mp4'
 final_video = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\videos\vid1.mp4'
+bg_song = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\audio\perfectgirl.mp3'
+sfx = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\sfx'
 # Set pvleopard Key
 leopard_key = 'nJlVKvSmD5anx+huNCZlVFkv74NxbEbqUlt8q9bQ7d+aGqJe6gtEHg=='
 # Set bin location: (can be anywhere)
@@ -15,10 +17,11 @@ combined = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot
 combined_subtitles = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\vid1234.mp4'
 audio_path = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\audio.mp3'
 ar_edited = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\vid123.mp4'
+subbed_video = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\vid1234.mp4'
 subtitles_path = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\subtitles.srt'
 
 
-def DownEdUp(top_video, bottom_video, combined_video, ar_video, subtitles,
+def DownEdUp(top_video, bottom_video, combined_video, ar_video, subtitles, sub_vid, bg_audio,
              output, audio, link, answer, length):
     """
     Editing the most replayed clip of a provided YouTube video hyperlink:
@@ -62,11 +65,14 @@ def DownEdUp(top_video, bottom_video, combined_video, ar_video, subtitles,
 
     vidCropper(combined_video, ar_video)
 
-    subbing2(ar_video, audio, subtitles, output)
+    subbing2(ar_video, audio, subtitles, sub_vid)
 
-    uploader()
+    inputAudio(sub_vid, bg_audio, output)
+
+    #uploader()
 
     return
+
 
 
 if __name__ == '__main__':
@@ -80,9 +86,43 @@ if __name__ == '__main__':
     # Asks user the type of download
     dl_type = int(input("Enter 1 for most replayed data, or 2 for user selected timestamps"))
 
-    """
-    Add input to ask user if to give timestamps, or use the ones from most replayed.
-    """
+    add_sfx = int(input("Enter 1 if you want to add SFX or 2 for randomly adding one"))
+
+    if add_sfx == 1:
+        print('--------')
+        print('Available SFX are:')
+        print('--------')
+        with os.scandir(sfx) as dirs:
+            for entry in dirs:
+                print(entry.name)
+        keyword = input(str('What sfx do you want?'))
+        second = input('At what time do you want the sfx?')
+
+    additional_sfx = int(input("Enter 1 if you want to add another SFX or 2 for none"))
+
+    if additional_sfx == 1:
+        print('--------')
+        print('Available SFX are:')
+        print('--------')
+        with os.scandir(sfx) as dirs:
+            for entry in dirs:
+                print(entry.name)
+        keyword2 = input(str('What sfx do you want?'))
+        second2 = input('At what time do you want the sfx?')
+
     # Run the Downloader, Edit, Uploader function.
-    DownEdUp(video1, screensaver, combined, ar_edited, subtitles_path,
+    DownEdUp(video1, screensaver, combined, ar_edited, subtitles_path, subbed_video, bg_song,
              final_video, audio_path, input_url, dl_type, length=1)
+
+
+    output = r'C:\Users\ignac\Downloads\vidsfx.mp4'
+    output2 = r'C:\Users\ignac\Downloads\vidsfx2.mp4'
+    if add_sfx == 1:
+        addSFX(sfx,final_video, output, second, keyword)
+
+    if additional_sfx == 1:
+        addSFX(sfx,output, output2, second2, keyword2)
+
+    if add_sfx == 2:
+        randSFX(sfx, final_video, output)
+

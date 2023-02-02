@@ -1,20 +1,25 @@
 """
  This script contains functions to combine two videos into one, create subtitles using pvleopard AI,
  and to write subtitles into a video.
+ It also contains adding audio to a video, as well as randomly adding a random sfx from a folder full of audioss
+ to a video.
 """
 
 import cv2
 import random
 import numpy as np
 import pvleopard
+import glob2
 import math
+import os
 import time
 import re
 from pvleopard import Sequence, Optional
-from moviepy.editor import VideoFileClip, concatenate_videoclips, CompositeVideoClip, AudioFileClip, clips_array
+from moviepy.editor import VideoFileClip, concatenate_videoclips, CompositeVideoClip, AudioFileClip, clips_array, CompositeAudioClip
 from moviepy.tools import cvsecs
 from moviepy.video.VideoClip import TextClip, VideoClip
 from moviepy.video.tools.subtitles import SubtitlesClip
+from moviepy.audio.fx import volumex
 
 
 def combineVideo(video1_path, ss_path, output_path, video_length):
@@ -141,19 +146,96 @@ def subbing(pvl_key, video_path, video_path2, audio_path, bin_path, bin_path2):
     return
 
 
-def inputAudio(video_path, audio_path, output):
+def inputAudio(video_path, audio_path, output, sound_level=0.06):
     """
-    inputAudio takes a recorded audio and plays it onto a video
-    :param video_path: soundless video path
-    :param audio_path: audio path
+    inputAudio takes a recorded song, cuts it and plays it onto a video as background sound. The added song
+    is edited so that it always has the same duration as the input video.
+    :param video_path: video path of input video
+    :param audio_path: audio of the song played on top of the video
     :param output: location of ouput video with sound
+
+    :argument sound_level: % of sound played onto a video, lower volume for bg music
+    :return:
+
+    Adapted from:
+    https://zulko.github.io/moviepy/ref/audiofx/moviepy.audio.fx.all.volumex.html#moviepy.audio.fx.all.volumex
+    """
+
+
+    # Output video file
+    video = VideoFileClip(video_path)
+    sound = video.audio
+    background_sound_path = AudioFileClip(audio_path)
+
+    duration = video.duration
+    duration2 = background_sound_path.duration
+    x = random.randint(5, round(duration2 - duration)-5)
+    # 5 and -5 set as factors so clip starts randomly after 5 seconds,
+    # and always ends 5 seconds before song ends
+
+    background_sound = background_sound_path.volumex(sound_level).subclip(x, duration+x)
+    mixed_audio = CompositeAudioClip([sound, background_sound])
+    final_clip = video.set_audio(mixed_audio)
+    final_clip.write_videofile(output)
+    return
+
+
+def randSFX(sfx_path, video_path, output):
+    """
+    Adds a random sound effect from a folder onto a video.
+    :param sfx_path: folder with sound effects
+    :param video_path: path of video being edited
+    :param output: desired path of output video
+    :return:
+
+    sfx_timestamp_percentage selects when to place the sound effect. Currently,
+    it is at a random location between the 15 and 35% percentile of the video length
+
+    """
+    path = sfx_path
+    # Randomly chooses a file from the sfx path:
+    sfx_sound_name = random.choice(os.listdir(sfx_path))
+    # Joins the path with the name of the sfx sound:
+    sfx_sound = os.path.join(path, sfx_sound_name)
+
+    sfx = AudioFileClip(sfx_sound)
+    video = VideoFileClip(video_path)
+
+    # Selects a random number between 15 and 35 to locate the sfx:
+    sfx_timestamp_percentage = random.randrange(15, 35)/100
+    sfx_timestamp = sfx_timestamp_percentage*video.duration
+
+    # Combines the audios, and export it.
+    new_audio = CompositeAudioClip([video.audio, sfx.set_start(sfx_timestamp)])
+    final_video = video.set_audio(new_audio)
+    final_video.write_videofile(output)
+    return
+
+
+
+def addSFX(sfx_folder_path, video_path, output, second, sfx_name):
+    """
+    Adds a  sound effect from a folder onto a video, by specifying the name, in the folder path,
+    the second at which the sfx is placed has to be specified.
+    :param sfx_folder_path: folder with sound effects
+    :param video_path: path of video being edited
+    :param output: desired path of output video
+    :param second: timestamp of where to place the sound
+    :param sfx_name: name of sfx file
     :return:
     """
-    # Output video file
-    finalclip = VideoFileClip(video_path)
-    sound = AudioFileClip(audio_path)
-    finalclip = finalclip.set_audio(sound)
-    finalclip.write_videofile(output)
+    path = os.listdir(sfx_folder_path)
+
+    # Joins the path with the name of the sfx sound:
+    sfx_sound = os.path.join(sfx_folder_path, sfx_name)
+
+    sfx = AudioFileClip(sfx_sound)
+    video = VideoFileClip(video_path)
+
+    # Combines the audios, and export it.
+    new_audio = CompositeAudioClip([video.audio, sfx.set_start(second)])
+    final_video = video.set_audio(new_audio)
+    final_video.write_videofile(output)
     return
 
 
@@ -191,7 +273,8 @@ def subbing2(video_path, audio_path, subtitles_path, final_path):
         f.write(to_srt(words))
 
     # Read the subtitles with desired font, size, color etc.
-    generator = lambda txt: TextClip(txt, font='Georgia-Regular', fontsize=65, color='white', bg_color='black')
+    generator = lambda txt: TextClip(txt, font='Arial', fontsize=65,
+                                     color='white', stroke_color='black', stroke_width=1)
     sub = SubtitlesClip(subtitles_path, generator)
 
     # Write the final video with the subtitles.
@@ -212,10 +295,8 @@ def second_to_timecode(x: float) -> str:
     return '%.2d:%.2d:%.2d,%.3d' % (hour, minute, second, millisecond)
 
 
-def to_srt(
-        words: Sequence[pvleopard.Leopard.Word],
-        endpoint_sec: float = 1.,
-        length_limit: Optional[int] = 4) -> str:
+def to_srt(words: Sequence[pvleopard.Leopard.Word], endpoint_sec: float = 1.,
+           length_limit: Optional[int] = 4) -> str:
     """
     Set: length_limit: Optional[int] =
     as the number of maximum words per subtitle eg if 4  then:

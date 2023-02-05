@@ -78,7 +78,8 @@ def DownEdUp(top_video, bottom_video, combined_video, ar_video, subtitles, sub_v
 if __name__ == '__main__':
     # Raise error if location for video1 is not empty.
     if os.path.exists(video1):
-        raise ValueError('%s should be empty!' % video1)
+        # Delete location of video 1
+        os.remove(video1)
 
     # Requests YouTube hyperlink from user.
     input_url = str(input("Enter Youtube Video Link"))
@@ -86,43 +87,44 @@ if __name__ == '__main__':
     # Asks user the type of download
     dl_type = int(input("Enter 1 for most replayed data, or 2 for user selected timestamps"))
 
-    add_sfx = int(input("Enter 1 if you want to add SFX or 2 for randomly adding one"))
-
-    if add_sfx == 1:
-        print('--------')
-        print('Available SFX are:')
-        print('--------')
-        with os.scandir(sfx) as dirs:
-            for entry in dirs:
-                print(entry.name)
-        keyword = input(str('What sfx do you want?'))
-        second = input('At what time do you want the sfx?')
-
-    additional_sfx = int(input("Enter 1 if you want to add another SFX or 2 for none"))
-
-    if additional_sfx == 1:
-        print('--------')
-        print('Available SFX are:')
-        print('--------')
-        with os.scandir(sfx) as dirs:
-            for entry in dirs:
-                print(entry.name)
-        keyword2 = input(str('What sfx do you want?'))
-        second2 = input('At what time do you want the sfx?')
+    # add_sfx = int(input("Enter 1 if you want to add SFX or 2 for randomly adding one"))
+    #
+    # if add_sfx == 1:
+    #     print('--------')
+    #     print('Available SFX are:')
+    #     print('--------')
+    #     with os.scandir(sfx) as dirs:
+    #         for entry in dirs:
+    #             print(entry.name)
+    #     keyword = input(str('What sfx do you want?'))
+    #     second = input('At what time do you want the sfx?')
+    #
+    # additional_sfx = int(input("Enter 1 if you want to add another SFX or 2 for none"))
+    #
+    # if additional_sfx == 1:
+    #     print('--------')
+    #     print('Available SFX are:')
+    #     print('--------')
+    #     with os.scandir(sfx) as dirs:
+    #         for entry in dirs:
+    #             print(entry.name)
+    #     keyword2 = input(str('What sfx do you want?'))
+    #     second2 = input('At what time do you want the sfx?')
 
     # Run the Downloader, Edit, Uploader function.
     DownEdUp(video1, screensaver, combined, ar_edited, subtitles_path, subbed_video, bg_song,
              final_video, audio_path, input_url, dl_type, length=1)
 
 
-    output = r'C:\Users\ignac\Downloads\vidsfx.mp4'
-    output2 = r'C:\Users\ignac\Downloads\vidsfx2.mp4'
-    if add_sfx == 1:
-        addSFX(sfx,final_video, output, second, keyword)
+    # output = r'C:\Users\ignac\Downloads\vidsfx.mp4'
+    # output2 = r'C:\Users\ignac\Downloads\vidsfx2.mp4'
+    # if add_sfx == 1:
+    #     addSFX(sfx,final_video, output, second, keyword)
+    #
+    # if additional_sfx == 1:
+    #     addSFX(sfx,output, output2, second2, keyword2)
+    #
+    # if add_sfx == 2:
+    #     randSFX(sfx, final_video, output)
 
-    if additional_sfx == 1:
-        addSFX(sfx,output, output2, second2, keyword2)
-
-    if add_sfx == 2:
-        randSFX(sfx, final_video, output)
 

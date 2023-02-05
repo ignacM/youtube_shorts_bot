@@ -146,7 +146,7 @@ def subbing(pvl_key, video_path, video_path2, audio_path, bin_path, bin_path2):
     return
 
 
-def inputAudio(video_path, audio_path, output, sound_level=0.06):
+def inputAudio(video_path, audio_path, output, sound_level=0.05):
     """
     inputAudio takes a recorded song, cuts it and plays it onto a video as background sound. The added song
     is edited so that it always has the same duration as the input video.
@@ -268,13 +268,17 @@ def subbing2(video_path, audio_path, subtitles_path, final_path):
     # Produce transcript with pvleopard.
     transcript, words = leopard.process_file(audio_path)
 
+
+    # new_words = [item.word.upper() for item in words]
+
     # Write generated subtitles into a srt file.
     with open(subtitles_path, 'w') as f:
         f.write(to_srt(words))
 
     # Read the subtitles with desired font, size, color etc.
-    generator = lambda txt: TextClip(txt, font='Arial', fontsize=65,
-                                     color='white', stroke_color='black', stroke_width=1)
+    generator = lambda txt: TextClip(txt, font='Comic-Sans-MS-Bold', fontsize=85,
+                                     color='white', stroke_color='black', stroke_width=5)
+    # TO PRINT IN ALL CAPPS go inside leopard.process_file and edit word= to add .upper()
     sub = SubtitlesClip(subtitles_path, generator)
 
     # Write the final video with the subtitles.
@@ -295,8 +299,8 @@ def second_to_timecode(x: float) -> str:
     return '%.2d:%.2d:%.2d,%.3d' % (hour, minute, second, millisecond)
 
 
-def to_srt(words: Sequence[pvleopard.Leopard.Word], endpoint_sec: float = 1.,
-           length_limit: Optional[int] = 4) -> str:
+def to_srt(words: Sequence[pvleopard.Leopard.Word], endpoint_sec: float = 0.3,
+           length_limit: Optional[int] = 3) -> str:
     """
     Set: length_limit: Optional[int] =
     as the number of maximum words per subtitle eg if 4  then:

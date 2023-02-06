@@ -4,6 +4,7 @@ import os
 import matplotlib.pyplot as plt
 import re
 import subprocess
+from moviepy.editor import VideoFileClip
 
 def getContentFromURL(url):
     """
@@ -15,7 +16,6 @@ def getContentFromURL(url):
 def getVideoID(url):
     # videoID finds the id of the video usually between the first = and &
     videoID = re.findall('=(.*?)&', url) # Find between = and &
-
     videoID = videoID[0]    # Obtain the first id
     return videoID
 
@@ -202,7 +202,7 @@ def download_clip_most_replayed(link, output_filename,
     return status, 'Downloaded'
 
 
-def download_clip_timestamps(link, output_filename, start, end,
+def download_clip_timestamps(link, output_2, output_filename, start, end,
                   tmp_dir='/tmp/kinetics',
                   num_attempts=5,
                   url_base='https://www.youtube.com/watch?v='):
@@ -276,12 +276,12 @@ def download_clip_timestamps(link, output_filename, start, end,
     #         #    '-loglevel', 'panic',
     #            '%s' % output_filename]
     command = ['powershell.exe ffmpeg',
-                '-ss', str(start_time),
-                '-i', '$(youtube-dl',
-                '-f', 'mp4',
-                '-g', '"%s")' % (url_base + video_identifier),
-                '-t', str(end_time-start_time),
-                '-c:v', 'libx264', '-c:a', 'copy', '%s' % output_filename]
+               '-ss', str(start_time),
+               '-i', '$(youtube-dl',
+               '-f', 'mp4',
+               '-g', '"%s")' % (url_base + video_identifier),
+               '-t', str(end_time - start_time),
+               '-c:v', 'libx264', '-c:a', 'copy', '%s' % output_filename]
     command = ' '.join(command)
     try:
         output = subprocess.check_output(command, shell=True,
@@ -315,6 +315,11 @@ def download_clip_timestamps(link, output_filename, start, end,
     # for /F "tokens=* delims=" %a in ('youtube-dl --get-url "%s"' %(url_base + video_identifier)) do (ffmpeg -ss 3 -i %a -t 15 output_filename)
     # Check if the video was successfully saved.
     status = os.path.exists(output_filename)
+
+    final = VideoFileClip(output_filename).subclip(1, -6)
+    final.write_videofile(output_2, fps=final.fps)
+    final.close
+
     # os.remove(tmp_filename)
     print('..................')
     print('..................')
@@ -323,11 +328,14 @@ def download_clip_timestamps(link, output_filename, start, end,
     print('..................')
     print('..................')
     print('..................')
+
+
     return status, 'Downloaded'
 
 
 if __name__ == '__main__':
     input_url = str(input("Enter Video Link"))  # Ask the user to write a youtube link
+    bin_loc = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\vid1.1.mp4'
     output = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\combined_videos\downloadedvid.mp4'
-    download_clip_most_replayed(input_url, output)
+    download_clip_timestamps(input_url, bin_loc, output, 10, 15)
 

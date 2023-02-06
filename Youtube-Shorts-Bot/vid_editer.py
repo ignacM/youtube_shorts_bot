@@ -276,13 +276,15 @@ def subbing2(video_path, audio_path, subtitles_path, final_path):
         f.write(to_srt(words))
 
     # Read the subtitles with desired font, size, color etc.
-    generator = lambda txt: TextClip(txt, font='Comic-Sans-MS-Bold', fontsize=85,
-                                     color='white', stroke_color='black', stroke_width=5)
-    # TO PRINT IN ALL CAPPS go inside leopard.process_file and edit word= to add .upper()
+    generator = lambda txt: TextClip(txt, font='Komika', fontsize=45,
+                                     color='white', stroke_color='black', stroke_width=5, method='caption')
+    # TO PRINT IN ALL CAPS go inside leopard.process_file and edit word= to add .upper()
     sub = SubtitlesClip(subtitles_path, generator)
 
     # Write the final video with the subtitles.
     final = CompositeVideoClip([videoclip, sub.set_position("center")])
+
+
     final.write_videofile(final_path, fps=videoclip.fps)
 
 
@@ -299,8 +301,8 @@ def second_to_timecode(x: float) -> str:
     return '%.2d:%.2d:%.2d,%.3d' % (hour, minute, second, millisecond)
 
 
-def to_srt(words: Sequence[pvleopard.Leopard.Word], endpoint_sec: float = 0.3,
-           length_limit: Optional[int] = 3) -> str:
+def to_srt(words: Sequence[pvleopard.Leopard.Word], endpoint_sec: float = 0.4,
+           length_limit: Optional[int] = 2) -> str:
     """
     Set: length_limit: Optional[int] =
     as the number of maximum words per subtitle eg if 4  then:
@@ -339,4 +341,13 @@ def to_srt(words: Sequence[pvleopard.Leopard.Word], endpoint_sec: float = 0.3,
     return '\n'.join(lines)
 
 
-#if __name__ == '__main__':
+def watermark(input, output, text='Simple Motivation'):
+    video = VideoFileClip(input).subclip(0, -1)
+    txt_clip = TextClip(txt=text, font='Komika', fontsize=20, color='white', stroke_color='black')
+    txt_clip = txt_clip.set_position("top").set_duration(video.duration)
+    final = CompositeVideoClip([video, txt_clip])
+    final.write_videofile(output)
+
+if __name__ == '__main__':
+
+    watermark(r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\vid12345.mp4', r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\vid123456.mp4')

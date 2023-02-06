@@ -31,7 +31,7 @@ def vidCropper(input_path, output_path,
     AR = 0.5625 # Standard 9:16
     new_width = int(h_frame*AR)
     new_height = int(h_frame)
-    x = int((h_frame-new_width)/2)
+    x = int((w_frame-new_width)/2)
     # -5 and +5 specified below to make aspect ratio slightly bigger.
     x, y, h, w = x-5, 0, new_height, new_width+5
 

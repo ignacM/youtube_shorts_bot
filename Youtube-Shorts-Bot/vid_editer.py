@@ -19,7 +19,9 @@ from moviepy.editor import VideoFileClip, concatenate_videoclips, CompositeVideo
 from moviepy.tools import cvsecs
 from moviepy.video.VideoClip import TextClip, VideoClip
 from moviepy.video.tools.subtitles import SubtitlesClip
+import moviepy.audio.fx.all as afx
 from moviepy.audio.fx import volumex
+
 
 
 def combineVideo(video1_path, ss_path, output_path, video_length):
@@ -146,7 +148,7 @@ def subbing(pvl_key, video_path, video_path2, audio_path, bin_path, bin_path2):
     return
 
 
-def inputAudio(video_path, audio_path, output, sound_level=0.05):
+def inputAudio(video_path, audio_path, output, sound_level=0.07):
     """
     inputAudio takes a recorded song, cuts it and plays it onto a video as background sound. The added song
     is edited so that it always has the same duration as the input video.
@@ -164,8 +166,8 @@ def inputAudio(video_path, audio_path, output, sound_level=0.05):
 
     # Output video file
     video = VideoFileClip(video_path)
-    sound = video.audio
-    background_sound_path = AudioFileClip(audio_path)
+    sound = video.audio.fx(afx.audio_normalize)
+    background_sound_path = AudioFileClip(audio_path).fx(afx.audio_normalize)
 
     duration = video.duration
     duration2 = background_sound_path.duration
@@ -210,7 +212,6 @@ def randSFX(sfx_path, video_path, output):
     final_video = video.set_audio(new_audio)
     final_video.write_videofile(output)
     return
-
 
 
 def addSFX(sfx_folder_path, video_path, output, second, sfx_name):
@@ -276,7 +277,7 @@ def subbing2(video_path, audio_path, subtitles_path, final_path):
         f.write(to_srt(words))
 
     # Read the subtitles with desired font, size, color etc.
-    generator = lambda txt: TextClip(txt, font='Komika', fontsize=45,
+    generator = lambda txt: TextClip(txt, font='Komika', fontsize=40,
                                      color='white', stroke_color='black', stroke_width=5, method='caption')
     # TO PRINT IN ALL CAPS go inside leopard.process_file and edit word= to add .upper()
     sub = SubtitlesClip(subtitles_path, generator)

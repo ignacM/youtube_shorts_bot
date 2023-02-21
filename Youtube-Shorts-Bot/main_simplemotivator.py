@@ -1,3 +1,12 @@
+"""
+Given link and timestamps, downloads a video from YouTube and edits it.
+    Edits done:
+    - AR adjustment for 16:9 view.
+    - Added subtitles
+    - Added background music
+    - Added watermark
+"""
+
 import os
 import time
 from vid_editer import combineVideo, subbing2, inputAudio, randSFX, addSFX, watermark
@@ -27,26 +36,27 @@ subtitles_path = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shor
 def DownEdUp(top_video, bin, vid_audio, ar_video, subtitles, sub_vid, bg_audio,
              output, audio, link, answer):
     """
-    Editing the most replayed clip of a provided YouTube video hyperlink:
+    Editing the clip of a provided YouTube video hyperlink:
         1. Given a user-input hyperlink, downloading the most replayed clip from a YouTube video,
-        or by giving timestamps
-        2. Given a location filled with screen saver videos, combine the downloaded clip
-         with a randomly chosen clip from the given location.
+        or by giving timestamps.
+        2. Format to mobile AR.
         3. Using pvleopard API for speach to text generation, use AI to create a transcription,
          input this transcription into the combined video from step 2.
+        4. Add background music.
+        5. Add watermark
+        6. Upload to YouTube
 
     List of parameters:
 
     :param top_video: absolute path to top video
-    :param bottom_video: absolute path to screensaver video
-    :param combined_video: absolute path to location of output video (video1 + video2, can be bin)
+    :param bin: bin video location
+    :param vid_audio: absolute path to location of output video after bg sound
     :param ar_video: absolute path of where to store AR adjusted video
     :param subtitles: absolute path of where to store subtitles (can be bin)
     :param output: absolute path to location of output video with audio (video1 + video2 + subtitles + audio)
     :param audio: absolute path to location of where to store audio (can be bin)
     :param link: YouTube hyperlink of video (should have visible most replayed data)
     :param answer: select 1 for most replayed data and 2 for input timestamps
-    :param length: (0-1) how long should the video be. 1: full clip included
     :return:
 
     key to access pvleopard API needs to be set inside subbing2 function.
@@ -58,6 +68,8 @@ def DownEdUp(top_video, bin, vid_audio, ar_video, subtitles, sub_vid, bg_audio,
     else:
         starting_time = str(input("What is the starting time?"))
         starting_time = sum(x * float(t) for x, t in zip([1, 60, 3600], reversed(starting_time.split(":"))))-1
+        if starting_time <= 0:
+            starting_time = 0
         # -1 seconds because uploader lags in first downloaded frame
         ending_time = str(input("What is the ending time?"))
         ending_time = sum(x * float(t) for x, t in zip([1, 60, 3600], reversed(ending_time.split(":"))))+7
@@ -93,12 +105,12 @@ if __name__ == '__main__':
     input_url = str(input("Enter Youtube Video Link"))
 
     # Asks user the type of download
-    dl_type = int(input("Enter 1 for most replayed data, or 2 for user selected timestamps"))
+    # dl_type = int(input("Enter 1 for most replayed data, or 2 for user selected timestamps"))
 
     #bg_song = str(input("Direction of bg_song"))
     # Run the Downloader, Edit, Uploader function.
     DownEdUp(video1, bin_loc, audio_video, ar_edited, subtitles_path, subbed_video, bg_song,
-             final_video, audio_path, input_url, dl_type)
+             final_video, audio_path, input_url, answer=2)
 
 
 

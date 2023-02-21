@@ -1,3 +1,8 @@
+"""
+Script contains several functions like obtaining most replayed data from a video, downloading a video using mrd,
+or downloading video with given timestamps.
+"""
+
 import requests
 import json
 import os
@@ -212,8 +217,11 @@ def download_clip_timestamps(link, output_2, output_filename, start, end,
     Download a video from YouTube if exists and is not blocked.
 
     :param link: given YouTube hyperlink
+    :param output_2: path where the video will be stored.
     :param output_filename: str
         File path where the video will be stored.
+    :param start: starting point of video (in seconds)
+    :param end: ending point of video clip (in seconds)
     :param num_attempts: given
     :param url_base: given
     :return:
@@ -316,7 +324,7 @@ def download_clip_timestamps(link, output_2, output_filename, start, end,
     # Check if the video was successfully saved.
     status = os.path.exists(output_filename)
 
-    final = VideoFileClip(output_filename).subclip(1, -6)
+    final = VideoFileClip(output_filename).subclip(1, -7)
     final.write_videofile(output_2, fps=final.fps)
     final.close
 
@@ -334,7 +342,7 @@ def download_clip_timestamps(link, output_2, output_filename, start, end,
 
 
 if __name__ == '__main__':
-    input_url = str(input("Enter Video Link"))  # Ask the user to write a youtube link
+    input_url = str(input("Enter Video Link"))  # Ask the user to write a YouTube link
     bin_loc = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\bin\vid1.1.mp4'
     output = r'C:\Users\ignac\PycharmProjects\youtube_video_bot\Youtube-Shorts-Bot\combined_videos\downloadedvid.mp4'
     download_clip_timestamps(input_url, bin_loc, output, 10, 15)

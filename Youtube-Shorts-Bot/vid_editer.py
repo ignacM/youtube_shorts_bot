@@ -1,7 +1,7 @@
 """
  This script contains functions to combine two videos into one, create subtitles using pvleopard AI,
  and to write subtitles into a video.
- It also contains adding audio to a video, as well as randomly adding a random sfx from a folder full of audioss
+ It also contains adding audio to a video, as well as randomly adding a random sfx from a folder full of audio files
  to a video.
 """
 
@@ -26,7 +26,7 @@ from moviepy.audio.fx import volumex
 
 def combineVideo(video1_path, ss_path, output_path, video_length):
     """
-    Video combiner that takes to videos and plays one on top of the other. The combiner randomly selects
+    Video combiner that takes two (2) videos and plays one on top of the other. The combiner randomly selects
     a clip of the second video with the same duration as the first video.
     :param video1_path: video path of the video that goes on top
     :param ss_path: video path of the video that goes below the top video.
@@ -58,8 +58,6 @@ def combineVideo(video1_path, ss_path, output_path, video_length):
     resolution = (resolution[1], resolution[0])
 
     input_video2 = VideoFileClip(ss_path, target_resolution=resolution).subclip(x, x+duration).without_audio()
-
-
 
     combined_video = clips_array([[input_video], [input_video2]])
 
@@ -216,8 +214,8 @@ def randSFX(sfx_path, video_path, output):
 
 def addSFX(sfx_folder_path, video_path, output, second, sfx_name):
     """
-    Adds a  sound effect from a folder onto a video, by specifying the name, in the folder path,
-    the second at which the sfx is placed has to be specified.
+    Adds a  sound effect from a folder onto a video, by specifying the name in the folder path, and
+    the second at which the sfx is placed.
     :param sfx_folder_path: folder with sound effects
     :param video_path: path of video being edited
     :param output: desired path of output video
@@ -255,7 +253,6 @@ def subbing2(video_path, audio_path, subtitles_path, final_path):
     :return:
 
     Other parameters needed are pvLeopard key, which can be input below
-
     """
 
     # Read video files and separate the audio
@@ -284,8 +281,6 @@ def subbing2(video_path, audio_path, subtitles_path, final_path):
 
     # Write the final video with the subtitles.
     final = CompositeVideoClip([videoclip, sub.set_position("center")])
-
-
     final.write_videofile(final_path, fps=videoclip.fps)
 
 
